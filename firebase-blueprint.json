@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with unique account code and subscription details for Google Auth",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique Firebase Authentication UID" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "email": { "type": "string", "description": "User email address" },
+        "photoURL": { "type": "string", "description": "User avatar profile picture URL" },
+        "accountCode": { "type": "string", "description": "Unique generated account code for subscriptions and license tracking" },
+        "subscriptionPlan": { "type": "string", "description": "Current subscription tier (free, creator, pro)" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account registration timestamp" },
+        "lastLoginAt": { "type": "string", "format": "date-time", "description": "Last login timestamp" }
+      },
+      "required": ["uid", "email", "accountCode", "createdAt"]
+    },
+    "UserProject": {
+      "title": "UserProject",
+      "description": "Individual 3D games and apps created and saved by the user under their account code",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Project ID" },
+        "userId": { "type": "string", "description": "Owner UID" },
+        "accountCode": { "type": "string", "description": "Owner account code" },
+        "title": { "type": "string", "description": "Project or game title" },
+        "htmlCode": { "type": "string", "description": "Runnable standalone HTML and Three.js code" },
+        "prompt": { "type": "string", "description": "Prompt used to generate the game" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["id", "userId", "title", "htmlCode", "createdAt"]
+    },
+    "PublishedApp": {
+      "title": "PublishedApp",
+      "description": "A web game or 3D application generated and published to Firebase.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the application or game" },
+        "htmlCode": { "type": "string", "description": "Complete runnable HTML code with embedded 3D engines and scripts" },
+        "prompt": { "type": "string", "description": "Original prompt or user request" },
+        "engine": { "type": "string", "description": "Engine used (e.g., threejs, realistic-fps, webgl, canvas)" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated or refreshed timestamp" },
+        "expiresAt": { "type": "string", "format": "date-time", "description": "Expiration date for monthly renewal cycle" },
+        "renewalCount": { "type": "number", "description": "Number of times this app was renewed" },
+        "creatorName": { "type": "string", "description": "Name or handle of creator" },
+        "creatorUid": { "type": "string", "description": "UID of author" },
+        "accountCode": { "type": "string", "description": "Account code of author" }
+      },
+      "required": ["title", "htmlCode", "createdAt", "expiresAt"]
+    },
+    "SubscriptionRequest": {
+      "title": "SubscriptionRequest",
+      "description": "User subscription requests for $20 cash transfer and WhatsApp verification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Request ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User name or phone" },
+        "cashNumber": { "type": "string", "description": "Sender cash number / reference" },
+        "whatsappNumber": { "type": "string", "description": "WhatsApp contact number" },
+        "amount": { "type": "number", "description": "Subscription amount, e.g. 20" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "description": "Status of request" },
+        "notes": { "type": "string", "description": "User or admin transaction note" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation date" },
+        "approvedAt": { "type": "string", "format": "date-time", "description": "Approval date" }
+      },
+      "required": ["id", "email", "status", "createdAt"]
+    },
+    "ApprovedEmail": {
+      "title": "ApprovedEmail",
+      "description": "Emails with active VIP subscription",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Approved email" },
+        "approvedAt": { "type": "string", "format": "date-time", "description": "Timestamp of approval" },
+        "approvedBy": { "type": "string", "description": "Admin email who approved" },
+        "active": { "type": "boolean", "description": "Whether subscription is active" }
+      },
+      "required": ["email", "active"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Platform settings for cash payment and WhatsApp numbers",
+      "type": "object",
+      "properties": {
+        "cashNumber": { "type": "string", "description": "Cash account number for transfers" },
+        "whatsappNumber": { "type": "string", "description": "WhatsApp contact number" },
+        "priceUsd": { "type": "number", "description": "Subscription price in USD" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated" }
+      },
+      "required": ["cashNumber", "whatsappNumber", "priceUsd"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "#/entities/UserProfile",
+      "description": "User profile with unique account code and subscription level"
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": "#/entities/UserProject",
+      "description": "User private saved 3D games and projects"
+    },
+    "/published_apps/{appId}": {
+      "schema": "#/entities/PublishedApp",
+      "description": "Collection of published web games and 3D applications"
+    },
+    "/subscriptions/{requestId}": {
+      "schema": "#/entities/SubscriptionRequest",
+      "description": "Subscription payment requests awaiting admin approval"
+    },
+    "/approved_emails/{emailId}": {
+      "schema": "#/entities/ApprovedEmail",
+      "description": "List of active VIP approved emails"
+    },
+    "/admin_settings/general": {
+      "schema": "#/entities/AdminSettings",
+      "description": "Global admin payment and WhatsApp settings"
+    }
+  }
+}
